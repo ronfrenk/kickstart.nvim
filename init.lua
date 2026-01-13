@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
@@ -100,6 +100,7 @@ vim.g.have_nerd_font = false
 
 -- Make line numbers default
 vim.o.number = true
+vim.o.relativenumber = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
 -- vim.o.relativenumber = true
@@ -168,6 +169,8 @@ vim.o.confirm = true
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
+
+vim.keymap.set('n', '<leader>tn', ':tabnew<CR>', { desc = 'Open new tab' })
 
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
@@ -683,6 +686,26 @@ require('lazy').setup({
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         -- ts_ls = {},
         --
+        vtsls = {
+          -- You can add specific settings here if needed
+          settings = {
+            typescript = {
+              importModuleSpecifierPreference = 'non-relative',
+              preferGoToSourceDefinition = true, -- Try to make gd behave like gs
+              server = {
+                launchArgs = { '--max-old-space-size=4096' }, -- Good for large projects
+              },
+              updateImportsOnFileMove = { enabled = 'always' },
+              inlayHints = {
+                parameterNames = { enabled = 'all' },
+                variableTypes = { enabled = true },
+              },
+            },
+            javascript = {
+              preferGoToSourceDefinition = true,
+            },
+          },
+        },
 
         lua_ls = {
           -- cmd = { ... },
@@ -720,7 +743,7 @@ require('lazy').setup({
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
       require('mason-lspconfig').setup {
-        ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
+        ensure_installed = vim.tbl_keys(servers), -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
         automatic_installation = false,
         handlers = {
           function(server_name)
@@ -941,7 +964,8 @@ require('lazy').setup({
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
-    main = 'nvim-treesitter.configs', -- Sets main module to use for opts
+    --main = 'nvim-treesitter.configs',
+    main = 'nvim-treesitter', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
       ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
@@ -984,7 +1008,7 @@ require('lazy').setup({
   --    This is the easiest way to modularize your config.
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  -- { import = 'custom.plugins' },
+  { import = 'custom.plugins' },
   --
   -- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
   -- Or use telescope!

@@ -84,6 +84,10 @@ I hope you enjoy your Neovim journey,
 P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 
+-- vim.opt.expandtab = true -- Use spaces
+-- vim.opt.shiftwidth = 2 -- Indent width for `=` and >>/<<
+-- vim.opt.softtabstop = 2 -- Insert mode <Tab> width
+
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
@@ -171,6 +175,7 @@ vim.o.confirm = true
 --  See `:help vim.keymap.set()`
 
 vim.keymap.set('n', '<leader>tn', ':tabnew<CR>', { desc = 'Open new tab' })
+vim.keymap.set('n', '<leader>tne', ':tabnew | Ex<CR>', { desc = 'Open new tab' })
 
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
@@ -904,20 +909,19 @@ require('lazy').setup({
     -- change the command in the config to whatever the name of that colorscheme is.
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'folke/tokyonight.nvim',
+    'catppuccin/nvim',
+    name = 'catppuccin',
     priority = 1000, -- Make sure to load this before all the other start plugins.
     config = function()
       ---@diagnostic disable-next-line: missing-fields
-      require('tokyonight').setup {
-        styles = {
-          comments = { italic = false }, -- Disable italics in comments
-        },
+      require('catppuccin').setup {
+        -- flavour = 'mocha',
       }
 
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      vim.cmd.colorscheme 'catppuccin'
     end,
   },
 
@@ -1035,6 +1039,15 @@ require('lazy').setup({
     },
   },
 })
+
+-- Require all Lua files under lua/config/
+local config_path = vim.fn.stdpath 'config' .. '/lua/config'
+local files = vim.fn.globpath(config_path, '*.lua', false, true)
+
+for _, file in ipairs(files) do
+  local module = 'config.' .. vim.fn.fnamemodify(file, ':t:r')
+  require(module)
+end
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et

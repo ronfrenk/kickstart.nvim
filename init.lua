@@ -175,7 +175,6 @@ vim.o.confirm = true
 --  See `:help vim.keymap.set()`
 
 vim.keymap.set('n', '<leader>tn', ':tabnew<CR>', { desc = 'Open new tab' })
-vim.keymap.set('n', '<leader>tne', ':tabnew | Ex<CR>', { desc = 'Open new tab' })
 
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`

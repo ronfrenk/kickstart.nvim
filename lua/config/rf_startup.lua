@@ -38,8 +38,16 @@ end
 
 local neo_tree_width = 35
 function openNeoTree()
+  local git_files = {
+    'COMMIT_EDITMSG',
+    'MERGE_MSG',
+    'SQUASH_MSG',
+    'TAG_EDITMSG',
+    'git-rebase-todo',
+  }
+  local filename = vim.fn.fnamemodify(vim.fn.argv(0), ':t')
   -- Only run if a file is opened
-  if vim.fn.argc() == 0 then
+  if vim.fn.argc() == 0 or vim.tbl_contains(git_files, filename) then
     return
   end
 
@@ -63,7 +71,11 @@ function openNeoTree()
   vim.api.nvim_win_set_width(neo_win, neo_tree_width)
 
   -- Ensure the right window has the original file
-  vim.api.nvim_set_current_win(file_win)
+  if vim.fn.argc() == 1 and vim.fn.argv(0) == '.' then
+    vim.api.nvim_set_current_win(neo_win)
+  else
+    vim.api.nvim_set_current_win(file_win)
+  end
   vim.api.nvim_win_set_buf(file_win, file_buf)
 end
 

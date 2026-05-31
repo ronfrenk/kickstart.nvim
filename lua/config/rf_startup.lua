@@ -44,6 +44,7 @@ function openNeoTree()
     'SQUASH_MSG',
     'TAG_EDITMSG',
     'git-rebase-todo',
+    '.',
   }
   local filename = vim.fn.fnamemodify(vim.fn.argv(0), ':t')
   -- Only run if a file is opened
@@ -59,23 +60,22 @@ function openNeoTree()
     end
   end
 
-  -- Save the file window
+  -- 1. Grab initial state
   local file_win = vim.api.nvim_get_current_win()
-  local file_buf = vim.api.nvim_win_get_buf(file_win)
+  local file_buf = vim.api.nvim_get_current_buf()
+  local is_dir = vim.fn.argv(0) == '.'
 
-  -- Open Neo-Tree in that split
-  vim.cmd 'Neotree reveal'
+  -- 2. Open Neo-tree
+  -- 'last' ensures it doesn't just replace the current buffer if it's a directory
+  vim.cmd 'Neotree show left'
   local neo_win = vim.api.nvim_get_current_win()
 
-  -- Resize the Neo-Tree window
+  -- 3. Resize
   vim.api.nvim_win_set_width(neo_win, neo_tree_width)
 
-  -- Ensure the right window has the original file
-  if vim.fn.argc() == 1 and vim.fn.argv(0) == '.' then
-    vim.api.nvim_set_current_win(neo_win)
-  else
-    vim.api.nvim_set_current_win(file_win)
-  end
+  -- Standard file open: focus the file
+  vim.api.nvim_set_current_win(file_win)
+  -- Ensure the buffer is correct
   vim.api.nvim_win_set_buf(file_win, file_buf)
 end
 

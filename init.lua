@@ -84,9 +84,10 @@ I hope you enjoy your Neovim journey,
 P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 
--- vim.opt.expandtab = true -- Use spaces
--- vim.opt.shiftwidth = 2 -- Indent width for `=` and >>/<<
--- vim.opt.softtabstop = 2 -- Insert mode <Tab> width
+vim.opt.expandtab = true -- Use spaces
+vim.opt.shiftwidth = 2 -- Indent width for `=` and >>/<<
+vim.opt.softtabstop = 2 -- Insert mode <Tab> width
+vim.opt.tabstop = 2
 
 -- Set <space> as the leader key
 -- See `:help mapleader`
@@ -580,6 +581,9 @@ require('lazy').setup({
           --  Useful when you're not sure what type a variable is and you want to see
           --  the definition of its *type*, not where it was *defined*.
           map('grt', require('telescope.builtin').lsp_type_definitions, '[G]oto [T]ype Definition')
+
+          map('n', '<leader>co', '<cmd>VtsExec organize_imports<cr>', { desc = 'Organize Imports' })
+          map('n', '<leader>ci', '<cmd>VtsExec add_missing_imports<cr>', { desc = 'Add Missing Imports' })
 
           -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
           ---@param client vim.lsp.Client

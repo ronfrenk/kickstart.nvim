@@ -20,6 +20,19 @@ return {
           ['\\'] = 'close_window',
         },
       },
+      filtered_items = {
+        visible = true, -- When true, it allows you to see "hidden" items
+        hide_dotfiles = false,
+        hide_gitignored = false,
+        hide_by_name = {
+          -- ".DS_Store",
+          -- "thumbs.db",
+        },
+        never_show = { -- remains hidden even if visible is toggled to true
+          -- ".DS_Store",
+          -- "thumbs.db",
+        },
+      },
     },
   },
 }

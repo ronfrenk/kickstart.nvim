@@ -564,7 +564,27 @@ require('lazy').setup({
           -- Jump to the definition of the word under your cursor.
           --  This is where a variable was first declared, or where a function is defined, etc.
           --  To jump back, press <C-t>.
-          map('grd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+          local attaching_client = vim.lsp.get_client_by_id(event.data.client_id)
+          if attaching_client and attaching_client.name == 'vtsls' then
+            -- vtsls exposes typescript.goToSourceDefinition which skips barrel re-exports
+            -- (index.ts with export *) and lands on the real source, unlike textDocument/definition.
+            map('grd', function()
+              local params = vim.lsp.util.make_position_params(0, 'utf-16')
+              attaching_client:request('workspace/executeCommand', {
+                command = 'typescript.goToSourceDefinition',
+                arguments = { params.textDocument.uri, params.position },
+              }, function(err, result)
+                if err or not result or #result == 0 then
+                  -- fall back to standard definition if command returns nothing
+                  vim.lsp.buf.definition()
+                  return
+                end
+                vim.lsp.util.jump_to_location(result[1], 'utf-16')
+              end, 0)
+            end, '[G]oto [D]efinition')
+          else
+            map('grd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+          end
 
           -- WARN: This is not Goto Definition, this is Goto Declaration.
           --  For example, in C this would take you to the header.
@@ -698,7 +718,18 @@ require('lazy').setup({
         -- ts_ls = {},
         --
         vtsls = {
-          -- You can add specific settings here if needed
+          -- Anchor root at monorepo root (nx.json, package.json) so tsconfig.base.json
+          -- path aliases resolve correctly. Without this, vtsls roots at the nearest
+          -- tsconfig.json (which in NX libs has files:[], include:[]) and can't follow @melio/* imports.
+          root_dir = function(fname)
+            local util = require 'lspconfig.util'
+            return util.root_pattern('nx.json', 'turbo.json')(fname)
+              or util.root_pattern 'tsconfig.base.json'(fname)
+              or util.root_pattern('package.json', 'tsconfig.json', '.git')(fname)
+          end,
+          on_init = function(client)
+            client.notify('workspace/didChangeConfiguration', { settings = client.config.settings })
+          end,
           settings = {
             typescript = {
               importModuleSpecifierPreference = 'non-relative',

@@ -186,6 +186,13 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
+-- Copy file:line reference to clipboard
+vim.keymap.set('n', '<leader>yr', function()
+  local ref = vim.fn.expand '%' .. ':' .. vim.api.nvim_win_get_cursor(0)[1]
+  vim.fn.setreg('+', ref)
+  vim.notify('Copied: ' .. ref)
+end, { desc = '[Y]ank file [R]eference to clipboard' })
+
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
 -- is not what someone will guess without a bit more experience.

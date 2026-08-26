@@ -1,6 +1,13 @@
 -- Neo-tree is a Neovim plugin to browse the file system
 -- https://github.com/nvim-neo-tree/neo-tree.nvim
 
+local function reveal_path()
+  local path = vim.fn.input('Reveal path: ', vim.fn.getcwd() .. '/', 'dir')
+  if path ~= '' then
+    require('neo-tree.command').execute { action = 'focus', reveal_file = vim.fn.fnamemodify(path, ':p'), reveal_force_cwd = true }
+  end
+end
+
 return {
   'nvim-neo-tree/neo-tree.nvim',
   version = '*',
@@ -12,12 +19,17 @@ return {
   lazy = false,
   keys = {
     { '\\', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
+    { '<leader>np', reveal_path, desc = '[N]eoTree reveal [P]ath' },
   },
   opts = {
     filesystem = {
       window = {
         mappings = {
           ['\\'] = 'close_window',
+          ['/'] = 'noop',
+          ['gp'] = function(_state)
+            reveal_path()
+          end,
         },
       },
       filtered_items = {

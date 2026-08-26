@@ -455,6 +455,12 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader><leader>', function()
         builtin.buffers { sort_lastused = true, ignore_current_buffer = true }
       end, { desc = '[ ] Find existing buffers' })
+      vim.keymap.set('n', '<leader>sp', function()
+        local path = vim.fn.input('Grep in path: ', vim.fn.expand '%:h' .. '/', 'dir')
+        if path ~= '' then
+          builtin.live_grep { search_dirs = { path } }
+        end
+      end, { desc = '[S]earch by grep in [P]ath' })
       vim.keymap.set('n', '<leader>gc', builtin.git_commits, { desc = '[G]it [C]ommits' })
 
       -- Slightly advanced example of overriding default behavior and theme
